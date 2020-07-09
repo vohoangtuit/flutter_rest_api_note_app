@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:rest_api_note_app/models/api_response.dart';
 import 'package:rest_api_note_app/models/note_model.dart';
 import 'package:rest_api_note_app/services/note_service.dart';
 import 'package:rest_api_note_app/views/note_delete.dart';
@@ -15,7 +16,9 @@ class NoteList extends StatefulWidget {
 
 class _NoteListState extends State<NoteList> {
   NotesService get service => GetIt.I<NotesService>();
-  List<NoteModel> notes =[];
+
+  APIResponse<List<NoteModel>> _apiResponse;
+  bool _isLoading =false;
 
   String formatDateTime(DateTime dateTime) {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
@@ -23,8 +26,20 @@ class _NoteListState extends State<NoteList> {
 
   @override
   void initState() {
+    _fetchNotes();
     super.initState();
-    notes = service.getNoteList();
+
+  }
+  _fetchNotes() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    _apiResponse = await service.getNoteList();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -40,36 +55,46 @@ class _NoteListState extends State<NoteList> {
         },
         child: Icon(Icons.add),
       ),
-      body: ListView.separated(
-        separatorBuilder: (_, __)=> Divider(height: 1,color: Colors.green,),
-        itemBuilder: (_,index){
-          return Dismissible(
-            key: ValueKey(notes[index].noteID),
-            direction:  DismissDirection.startToEnd,
+      body: Builder(
+        builder: (_){
+          if(_isLoading){
+            return Center(child: CircularProgressIndicator());
+          }
+          if(_apiResponse.error){
+            return Center(child: Text(_apiResponse.errorMessage));
+          }
+         return ListView.separated(
+            separatorBuilder: (_, __)=> Divider(height: 1,color: Colors.green,),
+            itemBuilder: (_,index){
+              return Dismissible(
+                key: ValueKey(_apiResponse.data[index].noteID),
+                direction:  DismissDirection.startToEnd,
 //            onDismissed: (direction){
 //            },
-            confirmDismiss: (direction)async {
+                confirmDismiss: (direction)async {
 
-             final result= await showDialog(context: context, builder: (_)=> NoteDelete());
-             print(result);
-             return result;
+                  final result= await showDialog(context: context, builder: (_)=> NoteDelete());
+                  print(result);
+                  return result;
 
+                },
+                background: Container(
+                  color: Colors.red,
+                  padding: EdgeInsets.only(left: 16),
+                  child: Align(child: Icon(Icons.delete, color: Colors.white,), alignment: Alignment.centerLeft,),
+                ),
+                child: ListTile(
+                  title: Text(_apiResponse.data[index].noteTitle, style: TextStyle(color: Theme.of(context).primaryColor),),
+                  subtitle: Text('Last edited on ${formatDateTime(_apiResponse.data[index].latestEditDateTime)}') ,
+                  onTap: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> NoteModify(_apiResponse.data[index].noteID)));
+                  },
+                ),
+              );
             },
-            background: Container(
-              color: Colors.red,
-              padding: EdgeInsets.only(left: 16),
-              child: Align(child: Icon(Icons.delete, color: Colors.white,), alignment: Alignment.centerLeft,),
-            ),
-            child: ListTile(
-              title: Text(notes[index].noteTitle, style: TextStyle(color: Theme.of(context).primaryColor),),
-               subtitle: Text('Last edited on ${formatDateTime(notes[index].lastEditDatetime)}') ,
-              onTap: (){
-                Navigator.of(context).push(MaterialPageRoute(builder: (_)=> NoteModify(notes[index].noteID)));
-              },
-            ),
-          );
+            itemCount: _apiResponse.data.isEmpty?0:_apiResponse.data.length,
+         );
         },
-        itemCount: notes.isEmpty?0:notes.length,
       ),
     );
   }

@@ -1,7 +1,7 @@
 class NoteModel{
   String noteID;
   String noteTitle;
-  DateTime createDatetime;
-  DateTime lastEditDatetime;
-  NoteModel({this.noteID, this.noteTitle, this.createDatetime, this.lastEditDatetime});
+  DateTime createDateTime;
+  DateTime latestEditDateTime;
+  NoteModel({this.noteID, this.noteTitle, this.createDateTime, this.latestEditDateTime});
 }
