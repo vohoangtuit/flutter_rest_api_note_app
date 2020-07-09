@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rest_api_note_app/models/api_response.dart';
 import 'package:rest_api_note_app/models/note_model.dart';
-import 'package:rest_api_note_app/services/note_service.dart';
+import 'package:rest_api_note_app/network/note_client.dart';
 import 'package:rest_api_note_app/views/note_delete.dart';
 
 import 'note_modify.dart';
@@ -15,7 +15,7 @@ class NoteList extends StatefulWidget {
 }
 
 class _NoteListState extends State<NoteList> {
-  NotesService get service => GetIt.I<NotesService>();
+  NotesClient get api => GetIt.I<NotesClient>();
 
   APIResponse<List<NoteModel>> _apiResponse;
   bool _isLoading =false;
@@ -35,7 +35,7 @@ class _NoteListState extends State<NoteList> {
       _isLoading = true;
     });
 
-    _apiResponse = await service.getNoteList();
+    _apiResponse = await api.getNoteList();
 
     setState(() {
       _isLoading = false;
@@ -85,7 +85,7 @@ class _NoteListState extends State<NoteList> {
                 ),
                 child: ListTile(
                   title: Text(_apiResponse.data[index].noteTitle, style: TextStyle(color: Theme.of(context).primaryColor),),
-                  subtitle: Text('Last edited on ${formatDateTime(_apiResponse.data[index].latestEditDateTime)}') ,
+                  subtitle: Text('Last edited on ${formatDateTime(_apiResponse.data[index].latestEditDateTime ?? _apiResponse.data[index].createDateTime)}'),
                   onTap: (){
                     Navigator.of(context).push(MaterialPageRoute(builder: (_)=> NoteModify(_apiResponse.data[index].noteID)));
                   },

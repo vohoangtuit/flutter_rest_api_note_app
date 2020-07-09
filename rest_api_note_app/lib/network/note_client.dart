@@ -4,7 +4,7 @@ import 'package:rest_api_note_app/models/api_response.dart';
 import 'package:rest_api_note_app/models/note_model.dart';
 import 'package:http/http.dart' as http;
 
-class NotesService{
+class NotesClient{
   // http://api.notes.programmingaddict.com/swagger/index.html
   static const API ="http://api.notes.programmingaddict.com/";
   static const header={
@@ -15,7 +15,13 @@ class NotesService{
         .then((data) {
           if(data.statusCode==200){
             final jsonData = json.decode(data.body);
+            print("jsonData "+jsonData.toString());
+          // print("jsonData "+jsonData);
+           //print("data.body "+data.body);
+            var noteList = NoteModel.parseNotes(data.body);
+            print("noteList "+noteList.toString());
             final notes = <NoteModel>[];
+
             for(var item in jsonData){
               final note = NoteModel(
                   noteID: item['noteID'],
