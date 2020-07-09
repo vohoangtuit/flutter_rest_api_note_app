@@ -1,19 +1,30 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:rest_api_note_app/models/note_model.dart';
+import 'package:rest_api_note_app/services/note_service.dart';
 import 'package:rest_api_note_app/views/note_delete.dart';
 
 import 'note_modify.dart';
 
-class NoteList extends StatelessWidget {
-  final notes = [
-    new NoteModel(noteID: '1',noteTitle: 'Note 1', createDatetime: DateTime.now(),lastEditDatetime: DateTime.now()),
-    new NoteModel(noteID: '2',noteTitle: 'Note 2', createDatetime: DateTime.now(),lastEditDatetime: DateTime.now()),
-    new NoteModel(noteID: '3',noteTitle: 'Note 3', createDatetime: DateTime.now(),lastEditDatetime: DateTime.now()),
-    new NoteModel(noteID: '4',noteTitle: 'Note 4', createDatetime: DateTime.now(),lastEditDatetime: DateTime.now()),
-  ];
+class NoteList extends StatefulWidget {
+
+  @override
+  _NoteListState createState() => _NoteListState();
+}
+
+class _NoteListState extends State<NoteList> {
+  NotesService get service => GetIt.I<NotesService>();
+  List<NoteModel> notes =[];
+
   String formatDateTime(DateTime dateTime) {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    notes = service.getNoteList();
   }
 
   @override
@@ -62,5 +73,4 @@ class NoteList extends StatelessWidget {
       ),
     );
   }
-
 }
