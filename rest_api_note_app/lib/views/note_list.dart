@@ -51,7 +51,11 @@ class _NoteListState extends State<NoteList> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          Navigator.of(context).push(MaterialPageRoute(builder: (_)=> NoteModify(null)));
+          Navigator.of(context).push(MaterialPageRoute(builder: (_)=> NoteModify()))
+              .then((value){
+                _fetchNotes();
+
+          });
         },
         child: Icon(Icons.add),
       ),
@@ -87,7 +91,7 @@ class _NoteListState extends State<NoteList> {
                   title: Text(_apiResponse.data[index].noteTitle, style: TextStyle(color: Theme.of(context).primaryColor),),
                   subtitle: Text('Last edited on ${formatDateTime(_apiResponse.data[index].latestEditDateTime ?? _apiResponse.data[index].createDateTime)}'),
                   onTap: (){
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> NoteModify(_apiResponse.data[index].noteID)));
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> NoteModify(noteID:_apiResponse.data[index].noteID)));
                   },
                 ),
               );

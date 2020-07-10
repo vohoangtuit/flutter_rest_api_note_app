@@ -2,12 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rest_api_note_app/models/api_response.dart';
+import 'package:rest_api_note_app/models/note_insert.dart';
 import 'package:rest_api_note_app/models/note_model.dart';
 import 'package:rest_api_note_app/network/note_client.dart';
 
 class NoteModify extends StatefulWidget {
   final String noteID;
-  NoteModify(this.noteID);
+  NoteModify({this.noteID});
 
   @override
   _NoteModifyState createState() => _NoteModifyState();
@@ -29,19 +30,24 @@ class _NoteModifyState extends State<NoteModify> {
   @override
   void initState() {
     setState(() {
-      _isLoading =true;
+
     });
-    api.getDetailNote(widget.noteID).then((response){
+    if(isEditing){
       setState(() {
-        _isLoading =false;
+        _isLoading =true;
       });
-      if(response.error){
-        errorMessage =response.errorMessage ?? 'Error occurred';
-      }
-      noteModel = response.data;
-      _titleController.text=noteModel.noteTitle;
-      _contentController.text=noteModel.noteContent;
-    });
+      api.getDetailNote(widget.noteID).then((response){
+        setState(() {
+          _isLoading =false;
+        });
+        if(response.error){
+          errorMessage =response.errorMessage ?? 'Error occurred';
+        }
+        noteModel = response.data;
+        _titleController.text=noteModel.noteTitle;
+        _contentController.text=noteModel.noteContent;
+      });
+    }
     super.initState();
   }
   @override
@@ -77,8 +83,40 @@ class _NoteModifyState extends State<NoteModify> {
               child: RaisedButton(
                 child: Text('Submit', style: TextStyle(color: Colors.white, fontSize: 15),),
                 color: Theme.of(context).primaryColor,
-                onPressed: ()=>{
-                  Navigator.of(context).pop(),
+                onPressed: () async{
+                  //Navigator.of(context).pop(),
+                  setState(() {
+                    _isLoading =true;
+                  });
+                  if(isEditing){
+                    // update
+                  }else{
+                    setState(() {
+                      _isLoading =false;
+                    });
+                     final note = NoteInsert(noteTitle: _titleController.text, noteContent: _contentController.text);
+                    final result = await api.createNote(note);
+                    final title ='Done';
+                    final message = result.error? (result.errorMessage??'An Error occurred'): 'You create was a Note';
+                    showDialog(context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text(title),
+                        content: Text(message),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text("OK"),
+                            onPressed: (){
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      )
+                    ).then((data) {
+                      if(result.data){
+                        Navigator.of(context).pop();
+                      }
+                    });
+                  }
                 },
               ),
             ),
