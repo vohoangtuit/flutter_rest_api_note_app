@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rest_api_note_app/models/api_response.dart';
-import 'package:rest_api_note_app/models/note_model.dart';
+import 'package:rest_api_note_app/models/note_list_model.dart';
 import 'package:rest_api_note_app/network/note_client.dart';
 import 'package:rest_api_note_app/views/note_delete.dart';
 
@@ -17,7 +17,7 @@ class NoteList extends StatefulWidget {
 class _NoteListState extends State<NoteList> {
   NotesClient get api => GetIt.I<NotesClient>();
 
-  APIResponse<List<NoteModel>> _apiResponse;
+  APIResponse<List<NotesModel>> _apiResponse;
   bool _isLoading =false;
 
   String formatDateTime(DateTime dateTime) {
