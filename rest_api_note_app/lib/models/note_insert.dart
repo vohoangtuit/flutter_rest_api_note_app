@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 
-class NoteInsert{
+class NoteInsertModify{
   String noteTitle;
   String noteContent;
-  NoteInsert({
+  NoteInsertModify({
     @required this.noteTitle,
     @required this.noteContent});
 

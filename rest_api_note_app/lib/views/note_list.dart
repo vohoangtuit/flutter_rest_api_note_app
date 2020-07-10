@@ -91,7 +91,9 @@ class _NoteListState extends State<NoteList> {
                   title: Text(_apiResponse.data[index].noteTitle, style: TextStyle(color: Theme.of(context).primaryColor),),
                   subtitle: Text('Last edited on ${formatDateTime(_apiResponse.data[index].latestEditDateTime ?? _apiResponse.data[index].createDateTime)}'),
                   onTap: (){
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> NoteModify(noteID:_apiResponse.data[index].noteID)));
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> NoteModify(noteID:_apiResponse.data[index].noteID))).then((value){
+                      _fetchNotes();
+                    });
                   },
                 ),
               );

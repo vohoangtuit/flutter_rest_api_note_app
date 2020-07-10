@@ -40,10 +40,20 @@ class NotesClient{
     }).catchError((_)=>APIResponse<NoteModel>(error:true, errorMessage:'An error occured'));
   }
 
-  Future<APIResponse<bool>> createNote(NoteInsert note){
+  Future<APIResponse<bool>> createNote(NoteInsertModify note){
     return http.post(API+'notes',headers: header, body: json.encode(note.toJson()))
         .then((data) {
       if(data.statusCode==201){
+        return APIResponse<bool>(data:true);
+      }
+      return APIResponse<bool>(error:true, errorMessage:'An error occured');
+    }).catchError((_)=>APIResponse<bool>(error:true, errorMessage:'An error occured'));
+  }
+
+  Future<APIResponse<bool>> updateNote(String noteID,NoteInsertModify note){
+    return http.put(API+'notes/'+noteID,headers: header, body: json.encode(note.toJson()))
+        .then((data) {
+      if(data.statusCode==204){
         return APIResponse<bool>(data:true);
       }
       return APIResponse<bool>(error:true, errorMessage:'An error occured');

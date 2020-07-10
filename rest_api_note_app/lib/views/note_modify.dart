@@ -29,9 +29,6 @@ class _NoteModifyState extends State<NoteModify> {
 
   @override
   void initState() {
-    setState(() {
-
-    });
     if(isEditing){
       setState(() {
         _isLoading =true;
@@ -89,33 +86,9 @@ class _NoteModifyState extends State<NoteModify> {
                     _isLoading =true;
                   });
                   if(isEditing){
-                    // update
+                    handelUpdate();
                   }else{
-                    setState(() {
-                      _isLoading =false;
-                    });
-                     final note = NoteInsert(noteTitle: _titleController.text, noteContent: _contentController.text);
-                    final result = await api.createNote(note);
-                    final title ='Done';
-                    final message = result.error? (result.errorMessage??'An Error occurred'): 'You create was a Note';
-                    showDialog(context: context,
-                      builder: (_) => AlertDialog(
-                        title: Text(title),
-                        content: Text(message),
-                        actions: <Widget>[
-                          FlatButton(
-                            child: Text("OK"),
-                            onPressed: (){
-                              Navigator.of(context).pop();
-                            },
-                          )
-                        ],
-                      )
-                    ).then((data) {
-                      if(result.data){
-                        Navigator.of(context).pop();
-                      }
-                    });
+                    handelInsert();
                   }
                 },
               ),
@@ -124,5 +97,60 @@ class _NoteModifyState extends State<NoteModify> {
         ),
       ),
     );
+  }
+
+   handelInsert() async {
+    final note = NoteInsertModify(noteTitle: _titleController.text, noteContent: _contentController.text);
+    final result = await api.createNote(note);
+    setState(() {
+      _isLoading =false;
+    });
+    final title ='Done';
+    final message = result.error? (result.errorMessage??'An Error occurred'): 'You create was a Note';
+    showDialog(context: context,
+        builder: (_) => AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("OK"),
+              onPressed: (){
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        )
+    ).then((data) {
+      if(result.data){
+        Navigator.of(context).pop();
+      }
+    });
+  }
+  void handelUpdate()async{
+    final note = NoteInsertModify(noteTitle: _titleController.text, noteContent: _contentController.text);
+    final result = await api.updateNote(widget.noteID,note);
+    setState(() {
+      _isLoading =false;
+    });
+    final title ='Done';
+    final message = result.error? (result.errorMessage??'An Error occurred'): 'You updated was a Note';
+    showDialog(context: context,
+        builder: (_) => AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("OK"),
+              onPressed: (){
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        )
+    ).then((data) {
+      if(result.data){
+        Navigator.of(context).pop();
+      }
+    });
   }
 }
