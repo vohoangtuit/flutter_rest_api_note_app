@@ -78,7 +78,11 @@ class _NoteListState extends State<NoteList> {
                 confirmDismiss: (direction)async {
 
                   final result= await showDialog(context: context, builder: (_)=> NoteDelete());
-                  print(result);
+                  //print(result);
+                  if(result){
+                    handelDeleteNote(context,_apiResponse.data[index].noteID);
+                  }
+
                   return result;
 
                 },
@@ -103,5 +107,30 @@ class _NoteListState extends State<NoteList> {
         },
       ),
     );
+  }
+
+  handelDeleteNote(BuildContext context,String noteID) async {
+    final result= await api.deleteNote(noteID);
+      var message;
+    if(result!=null && result.data==true){
+       message ='The note was deleted successfully';
+    }else{
+      message =result?.errorMessage?? 'An error occurred';
+    }
+    showDialog(context: context,
+    builder:(_)=> AlertDialog(
+      title: Text('Done'),
+      content: Text(message),
+      actions: <Widget>[
+        FlatButton(
+          child: Text('OK'),
+          onPressed: (){
+            Navigator.of(context).pop();
+          },
+        )
+      ],
+    )
+    );
+    return result?.data ?? false;
   }
 }

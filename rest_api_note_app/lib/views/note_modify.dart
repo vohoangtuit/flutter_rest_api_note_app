@@ -15,8 +15,7 @@ class NoteModify extends StatefulWidget {
 }
 
 class _NoteModifyState extends State<NoteModify> {
-  NotesClient get api => GetIt.I<NotesClient>();
-  APIResponse<NoteModel> _apiResponse;
+  NotesClient get API => GetIt.I<NotesClient>();
 
   bool get isEditing => widget.noteID!=null;
 
@@ -33,7 +32,7 @@ class _NoteModifyState extends State<NoteModify> {
       setState(() {
         _isLoading =true;
       });
-      api.getDetailNote(widget.noteID).then((response){
+      API.getDetailNote(widget.noteID).then((response){
         setState(() {
           _isLoading =false;
         });
@@ -101,7 +100,7 @@ class _NoteModifyState extends State<NoteModify> {
 
    handelInsert() async {
     final note = NoteInsertModify(noteTitle: _titleController.text, noteContent: _contentController.text);
-    final result = await api.createNote(note);
+    final result = await API.createNote(note);
     setState(() {
       _isLoading =false;
     });
@@ -128,7 +127,7 @@ class _NoteModifyState extends State<NoteModify> {
   }
   void handelUpdate()async{
     final note = NoteInsertModify(noteTitle: _titleController.text, noteContent: _contentController.text);
-    final result = await api.updateNote(widget.noteID,note);
+    final result = await API.updateNote(widget.noteID,note);
     setState(() {
       _isLoading =false;
     });
